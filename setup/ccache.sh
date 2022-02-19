@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 
 cd /tmp || exit 1
-git clone -b v4.5.1 git://github.com/ccache/ccache.git
+echo "Cloning ccache tag ${1:?}"
+git clone -b "${1:?}" git://github.com/ccache/ccache.git
 cd ccache || exit 1
 mkdir build || exit 1
 cd build || exit 1

@@ -7,11 +7,14 @@
 # Script to setup an AOSP Build environment on Ubuntu and Linux Mint
 
 LATEST_MAKE_VERSION="4.3"
+LATEST_CCACHE_TAG="v4.5.1"
 UBUNTU_16_PACKAGES="libesd0-dev"
 UBUNTU_20_PACKAGES="libncurses5 curl python-is-python3 libhiredis-dev"
 DEBIAN_10_PACKAGES="libncurses5"
 DEBIAN_11_PACKAGES="libncurses5"
 PACKAGES=""
+
+echo -e "Installing and updating APT packages...\n"
 
 sudo apt update
 
@@ -43,6 +46,8 @@ sudo DEBIAN_FRONTEND=noninteractive \
     texinfo unzip w3m xsltproc zip zlib1g-dev lzip \
     libxml-simple-perl libswitch-perl apt-utils \
     ${PACKAGES} -y
+
+echo -e "\nDone."
 
 echo -e "Setting up udev rules for adb!"
 sudo curl --create-dirs -L -o /etc/udev/rules.d/51-android.rules -O -L https://raw.githubusercontent.com/M0Rf30/android-udev-rules/master/51-android.rules
@@ -84,6 +89,31 @@ if [[ "$(command -v make)" ]]; then
         bash "$(dirname "$0")"/make.sh "${LATEST_MAKE_VERSION}"
     fi
 fi
+
+if [[ -z "$(command -v ccache)" ]]; then
+        echo "Installing ccache ${LATEST_CCACHE_TAG}"
+        bash "$(dirname "$0")"/cache.sh "${LATEST_CCACHE_TAG}"
+fi
+
+# Increase maximum ccache size
+echo -e "Setting ccache size to 100G"
+ccache -M 100G
+
+echo -e "\nSetting up shell environment..."
+if [[ $SHELL = *zsh* ]]; then
+sh_rc=".zshrc"
+else
+sh_rc=".bashrc"
+fi
+
+cat <<'EOF' >> $sh_rc
+
+# Super-fast repo sync
+repofastsync() { time schedtool -B -e ionice -n 0 `which repo` sync -c --force-sync --optimized-fetch --no-tags --no-clone-bundle -j$(nproc --all) "$@"; }
+
+export USE_CCACHE=1
+export CCACHE_EXEC=/usr/local/bin/ccache
+EOF
 
 echo "Installing repo"
 sudo curl --create-dirs -L -o /usr/local/bin/repo -O -L https://storage.googleapis.com/git-repo-downloads/repo
