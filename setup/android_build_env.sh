@@ -8,7 +8,7 @@
 
 LATEST_MAKE_VERSION="4.3"
 UBUNTU_16_PACKAGES="libesd0-dev"
-UBUNTU_20_PACKAGES="libncurses5 curl python-is-python3"
+UBUNTU_20_PACKAGES="libncurses5 curl python-is-python3 libhiredis-dev"
 DEBIAN_10_PACKAGES="libncurses5"
 DEBIAN_11_PACKAGES="libncurses5"
 PACKAGES=""
