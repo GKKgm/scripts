@@ -8,5 +8,6 @@ cd build || exit 1
 cmake -DZSTD_FROM_INTERNET=ON -DCMAKE_BUILD_TYPE=Release ..
 make -j"$(nproc)"
 sudo make install
-rm -rf "${PWD}"
 cd - || exit 1
+echo -e "Removing ccache tmp directory"
+rm -rf /tmp/ccache
