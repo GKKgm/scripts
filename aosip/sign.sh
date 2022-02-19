@@ -37,16 +37,17 @@ OUT="./out/target/product/$DEVICE"
 UPLOAD="./upload_assets"
 UPDATER_JSON="$DEVICE-$AOSIP_BUILDTYPE".json
 mkdir -pv "$UPLOAD"
-
+BACKUPTOOL="--backup=true"
 if [[ $WITH_GAPPS == "true" ]]; then
     SIGNING_FLAGS="-e CronetDynamite.apk= -e DynamiteLoader.apk= -e DynamiteModulesA.apk= -e AdsDynamite.apk= -e DynamiteModulesC.apk= -e MapsDynamite.apk= -e GoogleCertificates.apk= -e AndroidPlatformServices.apk="
+    BACKUPTOOL="--backup=false"
 fi
 
 echo "Signing target_files APKs"
 python2 ./build/make/tools/releasetools/sign_target_files_apks -p out/host/linux-x86/ -o -d ~/.android-certs $SIGNING_FLAGS "$OUT"/obj/PACKAGING/target_files_intermediates/aosip_"$DEVICE"-target_files-"$BUILD_NUMBER".zip "$UPLOAD/$SIGNED_TARGET_FILES" || exit 1
 
 echo "Generating signed otapackage"
-python2 ./build/make/tools/releasetools/ota_from_target_files -p out/host/linux-x86/ -k ~/.android-certs/releasekey --backup=true "$UPLOAD/$SIGNED_TARGET_FILES" "$UPLOAD/$SIGNED_OTAPACKAGE" || exit 1
+python2 ./build/make/tools/releasetools/ota_from_target_files -p out/host/linux-x86/ -k ~/.android-certs/releasekey "$BACKUPTOOL" "$UPLOAD/$SIGNED_TARGET_FILES" "$UPLOAD/$SIGNED_OTAPACKAGE" || exit 1
 
 echo "Generating signed images package"
 python2 ./build/make/tools/releasetools/img_from_target_files -p out/soong/host/linux-x86/ "$UPLOAD/$SIGNED_TARGET_FILES" "$UPLOAD/$SIGNED_IMAGE_PACKAGE" || exit 1
@@ -77,7 +78,7 @@ rm -rfv $UPLOAD
 ssh Illusion "mkdir /tmp/$BUILD_NUMBER; curl -Ls https://$(hostname)/$BUILD_NUMBER.tar | tar xv -C /tmp/$BUILD_NUMBER; rclone copy -P --drive-chunk-size 256M /tmp/$BUILD_NUMBER/ aosip-jenkins:$BUILD_NUMBER"
 rm -fv ~/nginx/$BUILD_NUMBER.tar
 
-if [[ $AOSIP_BUILDTYPE =~ ^(CI|CI_Gapps|Quiche|Quiche_Gapps)$ ]]; then
+if [[ $AOSIP_BUILDTYPE =~ ^(CI|CI_Gapps|Quiche|Quiche_Gapps|Ravioli|Ravioli_Gapps)$ ]]; then
     ssh Illusion "rm -rfv /tmp/$BUILD_NUMBER"
     scp "$UPDATER_JSON" Illusion:/tmp/
     ssh Illusion "rclone copy /tmp/$UPDATER_JSON aosip-jenkins:; rm -fv /tmp/$UPDATER_JSON"

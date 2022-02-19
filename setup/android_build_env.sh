@@ -10,6 +10,7 @@ LATEST_MAKE_VERSION="4.3"
 UBUNTU_16_PACKAGES="libesd0-dev"
 UBUNTU_20_PACKAGES="libncurses5 curl python-is-python3"
 DEBIAN_10_PACKAGES="libncurses5"
+DEBIAN_11_PACKAGES="libncurses5"
 PACKAGES=""
 
 sudo apt update
@@ -25,6 +26,8 @@ elif [[ ${LSB_RELEASE} =~ "Ubuntu 20" || ${LSB_RELEASE} =~ "Ubuntu 21" ]]; then
     PACKAGES="${UBUNTU_20_PACKAGES}"
 elif [[ ${LSB_RELEASE} =~ "Debian GNU/Linux 10" ]]; then
     PACKAGES="${DEBIAN_10_PACKAGES}"
+elif [[ ${LSB_RELEASE} =~ "Debian GNU/Linux 11" ]]; then
+    PACKAGES="${DEBIAN_11_PACKAGES}"
 fi
 
 sudo DEBIAN_FRONTEND=noninteractive \
@@ -38,7 +41,7 @@ sudo DEBIAN_FRONTEND=noninteractive \
     maven ncftp ncurses-dev patch patchelf pkg-config pngcrush \
     pngquant python2.7 python-all-dev re2c schedtool squashfs-tools subversion \
     texinfo unzip w3m xsltproc zip zlib1g-dev lzip \
-    libxml-simple-perl apt-utils \
+    libxml-simple-perl libswitch-perl apt-utils \
     ${PACKAGES} -y
 
 echo -e "Setting up udev rules for adb!"
