@@ -93,7 +93,7 @@ fi
 
 if [[ -z "$(command -v ccache)" ]]; then
         echo "Installing ccache ${LATEST_CCACHE_TAG}"
-        bash "$(dirname "$0")"/cache.sh "${LATEST_CCACHE_TAG}"
+        bash "$(dirname "$0")"/ccache.sh "${LATEST_CCACHE_TAG}"
 fi
 
 # Increase maximum ccache size
