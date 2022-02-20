@@ -70,6 +70,7 @@ if [[ -z ${GIT_EMAIL} ]]; then
     git config --global user.email "${EMAIL}"
 fi
 git config --global credential.helper "cache --timeout=7200"
+git config --global url.https://singapore.source.codeaurora.org.insteadOf https://source.codeaurora.org
 echo "git identity setup successfully!"
 
 if [[ "$(command -v adb)" != "" ]]; then
