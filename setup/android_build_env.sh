@@ -102,9 +102,9 @@ ccache -M 100G
 
 echo -e "\nSetting up shell environment..."
 if [[ $SHELL = *zsh* ]]; then
-sh_rc="~/.zshrc"
+sh_rc="${HOME}/.zshrc"
 else
-sh_rc="~/.bashrc"
+sh_rc="${HOME}/.bashrc"
 fi
 
 cat <<'EOF' >> $sh_rc
