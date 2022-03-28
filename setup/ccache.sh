@@ -2,7 +2,7 @@
 
 cd /tmp || exit 1
 echo "Cloning ccache tag ${1:?}"
-git clone -b "${1:?}" git://github.com/ccache/ccache.git
+git clone -b "${1:?}" https://github.com/ccache/ccache.git
 cd ccache || exit 1
 mkdir build || exit 1
 cd build || exit 1
