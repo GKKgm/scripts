@@ -16,11 +16,6 @@ PACKAGES=""
 
 echo -e "Installing and updating APT packages...\n"
 
-echo "Adding GitHub apt key and repository!"
-sudo apt install software-properties-common -y
-sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-key C99B11DEB97541F0
-sudo apt-add-repository https://cli.github.com/packages
-
 sudo apt update
 
 # Install lsb-core packages
