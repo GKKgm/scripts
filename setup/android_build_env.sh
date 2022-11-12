@@ -118,3 +118,9 @@ EOF
 echo "Installing repo"
 sudo curl --create-dirs -L -o /usr/local/bin/repo -O -L https://storage.googleapis.com/git-repo-downloads/repo
 sudo chmod a+rx /usr/local/bin/repo
+
+echo -e "Installing bottom"
+curl -LO https://github.com/ClementTsang/bottom/releases/download/nightly/bottom_x86_64-unknown-linux-gnu.deb
+sudo dpkg -i bottom_x86_64-unknown-linux-gnu.deb
+rm bottom_x86_64-unknown-linux-gnu.deb
+echo -e "\nDone!"
