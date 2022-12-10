@@ -19,7 +19,8 @@ echo -e "Installing and updating APT packages...\n"
 sudo apt update
 
 # Install lsb-core packages
-sudo apt install lsb-core -y
+sudo DEBIAN_FRONTEND=noninteractive \
+    apt install lsb-core -y
 
 LSB_RELEASE="$(lsb_release -d | cut -d ':' -f 2 | sed -e 's/^[[:space:]]*//')"
 
