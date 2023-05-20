@@ -7,7 +7,7 @@
 # Script to setup an AOSP Build environment on Ubuntu and Linux Mint
 
 LATEST_MAKE_VERSION="4.3"
-LATEST_CCACHE_TAG="v4.8"
+LATEST_CCACHE_TAG="v4.8.1"
 UBUNTU_16_PACKAGES="libesd0-dev"
 UBUNTU_20_PACKAGES="libncurses5 curl python-is-python3 libhiredis-dev"
 DEBIAN_10_PACKAGES="libncurses5"
@@ -45,16 +45,10 @@ sudo DEBIAN_FRONTEND=noninteractive \
     maven ncftp ncurses-dev patch patchelf pkg-config pngcrush \
     pngquant python2.7 python-all-dev re2c schedtool squashfs-tools subversion \
     texinfo unzip w3m xsltproc zip zlib1g-dev lzip \
-    libxml-simple-perl libswitch-perl apt-utils jq \
+    libxml-simple-perl libswitch-perl apt-utils jq ripgrep \
     ${PACKAGES} -y
 
 echo -e "\nDone."
-
-echo -e "Setting up udev rules for adb!"
-sudo curl --create-dirs -L -o /etc/udev/rules.d/51-android.rules -O -L https://raw.githubusercontent.com/M0Rf30/android-udev-rules/master/51-android.rules
-sudo chmod 644 /etc/udev/rules.d/51-android.rules
-sudo chown root /etc/udev/rules.d/51-android.rules
-sudo systemctl restart udev
 
 # For all those distro hoppers, lets setup your git credentials
 GIT_USERNAME="$(git config --get user.name)"
@@ -70,18 +64,15 @@ if [[ -z ${GIT_EMAIL} ]]; then
     read -r EMAIL
     git config --global user.email "${EMAIL}"
 fi
-git config --global credential.helper "cache --timeout=7200"
+git config --global alias.cp 'cherry-pick'
+git config --global alias.c 'commit'
+git config --global alias.f 'fetch'
+git config --global alias.m 'merge'
+git config --global alias.rb 'rebase'
+git config --global alias.rs 'reset'
+git config --global alias.ck 'checkout'
+git config --global credential.helper 'cache --timeout=99999999'
 echo "git identity setup successfully!"
-
-if [[ "$(command -v adb)" != "" ]]; then
-    echo -e "Setting up udev rules for adb!"
-    sudo curl --create-dirs -L -o /etc/udev/rules.d/51-android.rules -O -L https://raw.githubusercontent.com/M0Rf30/android-udev-rules/master/51-android.rules
-    sudo chmod 644 /etc/udev/rules.d/51-android.rules
-    sudo chown root /etc/udev/rules.d/51-android.rules
-    sudo systemctl restart udev
-    adb kill-server
-    sudo killall adb
-fi
 
 if [[ "$(command -v make)" ]]; then
     makeversion="$(make -v | head -1 | awk '{print $3}')"
@@ -110,7 +101,7 @@ fi
 cat <<'EOF' >> $sh_rc
 
 # Super-fast repo sync
-repofastsync() { time schedtool -B -e ionice -n 0 `which repo` sync -c --force-sync --optimized-fetch --no-tags --no-clone-bundle -j$(nproc --all) "$@"; }
+repofastsync() { time schedtool -B -e ionice -n 0 `which repo` sync -c --force-sync --optimized-fetch --no-tags --no-clone-bundle --retry-fetches=5 -j$(nproc --all) "$@"; }
 
 export USE_CCACHE=1
 export CCACHE_EXEC=/usr/local/bin/ccache
@@ -121,7 +112,7 @@ sudo curl --create-dirs -L -o /usr/local/bin/repo -O -L https://storage.googleap
 sudo chmod a+rx /usr/local/bin/repo
 
 echo -e "Installing bottom"
-curl -LO https://github.com/ClementTsang/bottom/releases/download/nightly/bottom_x86_64-unknown-linux-gnu.deb
-sudo dpkg -i bottom_x86_64-unknown-linux-gnu.deb
-rm bottom_x86_64-unknown-linux-gnu.deb
+curl -LO https://github.com/ClementTsang/bottom/releases/download/0.9.1/bottom_0.9.1_amd64.deb
+sudo dpkg -i bottom_0.9.1_amd64.deb
+rm bottom_0.9.1_amd64.deb
 echo -e "\nDone!"
