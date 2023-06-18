@@ -7,7 +7,7 @@
 # Script to setup an AOSP Build environment on Ubuntu and Linux Mint
 
 LATEST_MAKE_VERSION="4.3"
-LATEST_CCACHE_TAG="v4.8.1"
+LATEST_CCACHE_TAG="v4.8.2"
 UBUNTU_16_PACKAGES="libesd0-dev"
 UBUNTU_20_PACKAGES="libncurses5 curl python-is-python3 libhiredis-dev"
 DEBIAN_10_PACKAGES="libncurses5"
