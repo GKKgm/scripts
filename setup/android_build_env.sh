@@ -14,6 +14,9 @@ DEBIAN_10_PACKAGES="libncurses5"
 DEBIAN_11_PACKAGES="libncurses5"
 PACKAGES=""
 
+# Get the output of uname -a and store it in a variable
+uname_output=$(uname -a)
+
 echo -e "Installing and updating APT packages...\n"
 
 sudo apt update
@@ -82,6 +85,7 @@ if [[ "$(command -v make)" ]]; then
     fi
 fi
 
+if [[ "$uname_output" != *"azure"* ]]; then
 if [[ -z "$(command -v ccache)" ]]; then
         echo "Installing ccache ${LATEST_CCACHE_TAG}"
         bash "$(dirname "$0")"/ccache.sh "${LATEST_CCACHE_TAG}"
@@ -90,6 +94,9 @@ fi
 # Increase maximum ccache size
 echo -e "Setting ccache size to 100G"
 ccache -M 100G
+else
+echo -e "Found Azure VM, skipping ccache"
+fi
 
 echo -e "\nSetting up shell environment..."
 if [[ $SHELL = *zsh* ]]; then
@@ -102,17 +109,30 @@ cat <<'EOF' >> $sh_rc
 
 # Super-fast repo sync
 repofastsync() { time schedtool -B -e ionice -n 0 `which repo` sync -c --force-sync --optimized-fetch --no-tags --no-clone-bundle --retry-fetches=5 -j$(nproc --all) "$@"; }
+EOF
+
+if [[ "$uname_output" != *"azure"* ]]; then
+cat <<'EOF' >> $sh_rc
 
 export USE_CCACHE=1
 export CCACHE_EXEC=/usr/local/bin/ccache
 EOF
+else
+echo -e "Found Azure VM, skipping ccache env"
+fi
 
 echo "Installing repo"
 sudo curl --create-dirs -L -o /usr/local/bin/repo -O -L https://storage.googleapis.com/git-repo-downloads/repo
 sudo chmod a+rx /usr/local/bin/repo
 
+if [[ "$uname_output" != *"azure"* ]]; then
 echo -e "Installing bottom"
 curl -LO https://github.com/ClementTsang/bottom/releases/download/0.9.1/bottom_0.9.1_amd64.deb
 sudo dpkg -i bottom_0.9.1_amd64.deb
 rm bottom_0.9.1_amd64.deb
+
+else
+echo -e "Found Azure VM, skipping bottom setup"
+fi
+
 echo -e "\nDone!"
